@@ -38,6 +38,34 @@
   <title>Xintel</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- CORS Anywhere proxy script -->
+  <script>
+    // Override fetch to use CORS Anywhere proxy
+    const originalFetch = window.fetch;
+    window.fetch = function (url, options) {
+      // Only proxy requests to your backend
+      if (typeof url === 'string' &&
+        (url.includes('backend.educhain.tech') ||
+          url.includes('chat.educhain.tech') ||
+          url.includes('hasura.educhain.tech'))) {
+
+        console.log('Proxying request to:', url);
+        // Use CORS Anywhere public proxy
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+
+        // Create new options with CORS headers
+        const newOptions = options || {};
+        newOptions.headers = newOptions.headers || {};
+        newOptions.headers['X-Requested-With'] = 'XMLHttpRequest';
+
+        return originalFetch(proxyUrl + url, newOptions);
+      }
+
+      // For all other requests, use original fetch
+      return originalFetch(url, options);
+    };
+  </script>
+
   <style>
     /* Ngăn chặn context menu và selection */
     body {
